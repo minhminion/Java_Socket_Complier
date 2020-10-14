@@ -35,6 +35,20 @@
             <version>3.9</version>
         </dependency>
 
+        <!-- LOOK AND FEEL -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>0.43</version>
+        </dependency>
+
+        <!--  CODE EDITOR -->
+        <dependency>
+            <groupId>com.fifesoft</groupId>
+            <artifactId>rsyntaxtextarea</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>
