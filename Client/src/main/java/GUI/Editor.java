@@ -1,36 +1,34 @@
-package com.compiler.socket.client.view;
+package GUI;
 
-import com.compiler.socket.client.view.component.CodeEditor;
+import BUS.EditorHandler;
+import GUI.components.CodeEditor;
 import com.complier.socket.commons.enums.Action;
 import com.complier.socket.commons.enums.Language;
 import com.complier.socket.commons.request.CompileRequest;
 import com.complier.socket.commons.request.Request;
 import com.complier.socket.commons.response.CompileResponse;
 import com.complier.socket.commons.response.MessageResponse;
-import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatDarculaLaf;
 import org.apache.commons.lang3.ObjectUtils;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class Layout extends JFrame{
-    private Socket clientSocket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
+public class Editor extends JFrame{
+    private EditorHandler editorHandler;
 
     // GUI
     private CodeEditor codeEditor;
     private Language currentLanguage = Language.JAVA;
 
-    public Layout () {
+    public Editor() {
         codeEditor = new CodeEditor();
         setContentPane(codeEditor);
         setJMenuBar(createMenuBar());
@@ -38,55 +36,6 @@ public class Layout extends JFrame{
         codeEditor.setText("JavaExample.txt");
         pack();
         setTitle("Banana Boys Compiler");
-    }
-
-    public void start(String ip, int port) {
-        try {
-            clientSocket = new Socket(ip, port);
-            this.in = new ObjectInputStream(clientSocket.getInputStream());
-            this.out = new ObjectOutputStream(clientSocket.getOutputStream());
-            new ResponseProcess().start();
-            setVisible(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendRequest (Request req) throws IOException {
-        this.out.writeObject(req);
-        this.out.flush();
-    }
-
-    private class ResponseProcess extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    Object object = in.readObject();
-                    if (ObjectUtils.isEmpty(object)) {
-                        continue;
-                    }
-
-                    if (object instanceof MessageResponse) {
-                        MessageResponse messageResponse = (MessageResponse) object;
-                        System.out.println("Message from server " + messageResponse.getMessage());
-                    } else if (object instanceof CompileResponse) {
-                        CompileResponse compileResponse = (CompileResponse) object;
-                        System.out.println( "After Formatter \n" +
-                                "=============== \n"+
-                                compileResponse.getCode()+"\n"+
-                                "===== [OUTPUT] =====\n"+
-                                compileResponse.getOutput()
-                        );
-                    }
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private void addSyntaxItem(Language language, String name, String res, String style,
@@ -160,6 +109,14 @@ public class Layout extends JFrame{
 
     }
 
+    public void setHandler(EditorHandler editorHandler) {
+        this.editorHandler = editorHandler;
+    }
+
+    public void setText(String code) {
+        codeEditor.setTextArea(code);
+    }
+
     private class ChangeSyntaxStyleAction extends AbstractAction {
 
         private String res;
@@ -209,37 +166,17 @@ public class Layout extends JFrame{
     private class CompileCodeAction extends AbstractAction {
 
         CompileCodeAction() {
-            putValue(NAME, "Run");
+            putValue(NAME, "Compile");
         }
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            // TODO:
-            // Send Request over here
-            String value = codeEditor.getTextArea().getText();
-            try {
-                sendRequest(CompileRequest
-                        .builder()
-                        .action(Action.COMPILE_CODE)
-                        .code(value)
-                        .language(currentLanguage)
-                        .build());
-                System.out.println(value);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(editorHandler != null) {
+                String code = codeEditor.getTextArea().getText();
+                editorHandler.compileCode(currentLanguage, code);
+                System.out.println(code);
             }
         }
     }
 
-    public static void main (String arg[]) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel( new FlatIntelliJLaf() );
-            } catch (Exception e) {
-                e.printStackTrace(); // Never happens ;))
-            }
-            Layout client = new Layout();
-            client.start("0.0.0.0", 5000);
-        });
-    }
 }

@@ -1,4 +1,4 @@
-package com.compiler.socket.client;
+package BUS;
 
 import com.complier.socket.commons.enums.Action;
 import com.complier.socket.commons.enums.Language;
@@ -17,13 +17,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class Client {
+public class Client_CMD {
     private Socket clientSocket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private Scanner scanner;
 
-    public Client() {}
+    public Client_CMD() {}
 
     private void sendRequest (Request req) throws IOException {
         this.out.writeObject(req);

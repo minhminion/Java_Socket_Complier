@@ -1,4 +1,4 @@
-package com.compiler.socket.client.view.component;
+package GUI.components;
 
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -95,8 +95,8 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
         return textArea;
     }
 
-    public void setTextArea(RSyntaxTextArea textArea) {
-        this.textArea = textArea;
+    public void setTextArea(String code) {
+        this.textArea.setText(code);
     }
 
     @Override

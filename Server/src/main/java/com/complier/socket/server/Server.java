@@ -34,6 +34,7 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(serverSocket.accept());
                 clientHandler.start();
                 String clientUid = clientHandler.getUid();
+                System.out.println(clientHandler.clientSocket.getLocalSocketAddress().toString());
                 System.out.println("Connected to Client ["+clientUid+"]");
                 this.clientHandlers.put(clientUid, clientHandler);
             }
