@@ -89,13 +89,14 @@ public class EditorHandler {
                         CompileResponse compileResponse = (CompileResponse) object;
                         if(editor != null) {
                             editor.setText(compileResponse.getCode());
+                            editor.getConsole().addText(compileResponse.getOutput());
                         }
-                        System.out.println( "After Formatter \n" +
-                                "=============== \n"+
-                                compileResponse.getCode()+"\n"+
-                                "===== [OUTPUT] =====\n"+
-                                compileResponse.getOutput()
-                        );
+//                        System.out.println( "After Formatter \n" +
+//                                "=============== \n"+
+//                                compileResponse.getCode()+"\n"+
+//                                "===== [OUTPUT] =====\n"+
+//                                compileResponse.getOutput()
+//                        );
                     }
 
                 }
@@ -105,6 +106,10 @@ public class EditorHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Socket getClientSocket () {
+        return clientSocket;
     }
 
 }

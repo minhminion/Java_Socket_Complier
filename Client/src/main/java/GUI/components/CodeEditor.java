@@ -1,5 +1,6 @@
 package GUI.components;
 
+import com.complier.socket.commons.enums.Language;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
@@ -16,10 +17,12 @@ import java.nio.charset.StandardCharsets;
 
 public class CodeEditor extends JRootPane implements HyperlinkListener,
         SyntaxConstants {
+    private Language language;
     private RTextScrollPane scrollPane;
     private RSyntaxTextArea textArea;
 
-    public CodeEditor() {
+    public CodeEditor(Language language) {
+        this.language = language;
         textArea = createTextArea();
         textArea.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
         scrollPane = new RTextScrollPane(textArea, true);
@@ -80,9 +83,15 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
             textArea.setText("Type here to see syntax highlighting");
         }
     }
-//    public void setText(String text) {
-//        textArea.setText(text);
-//    }
+
+    public void setLanguage (Language language) {
+        this.language = language;
+    }
+
+    public Language getLanguage () {
+        return language;
+    }
+
     public void setCaretPosition(int pos) {
         textArea.setCaretPosition(pos);
     }

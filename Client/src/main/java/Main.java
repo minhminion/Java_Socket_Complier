@@ -1,5 +1,6 @@
 import BUS.EditorHandler;
 import GUI.Editor;
+import GUI.components.Console;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
@@ -17,7 +18,9 @@ public class Main {
             editor.setVisible(true);
             EditorHandler editorHandler = new EditorHandler(editor);
             editorHandler.startConnection("0.0.0.0", 5000);
-            editor.setHandler(editorHandler);
+            if(editorHandler.getClientSocket() != null) {
+                editor.setHandler(editorHandler);
+            }
         });
 
     }
