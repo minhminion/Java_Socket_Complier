@@ -1,8 +1,6 @@
-import BUS.EditorHandler;
-import GUI.Editor;
-import GUI.components.Console;
+import socket.client.BUS.EditorHandler;
+import socket.client.GUI.Editor;
 import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
 
 import javax.swing.*;
 
