@@ -18,9 +18,6 @@ public class Main {
             editor.setVisible(true);
             EditorHandler editorHandler = new EditorHandler(editor);
             editorHandler.startConnection("0.0.0.0", 5000);
-            if(editorHandler.getClientSocket() != null) {
-                editor.setHandler(editorHandler);
-            }
         });
 
     }

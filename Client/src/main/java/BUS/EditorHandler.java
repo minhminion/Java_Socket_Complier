@@ -35,6 +35,9 @@ public class EditorHandler {
         try {
 //          Create Client socket
             clientSocket = new Socket(ip, port);
+            if(clientSocket.isConnected()) {
+                editor.setHandler(this);
+            }
             this.in = new ObjectInputStream(clientSocket.getInputStream());
             this.out = new ObjectOutputStream(clientSocket.getOutputStream());
             new ResponseProcess().start();

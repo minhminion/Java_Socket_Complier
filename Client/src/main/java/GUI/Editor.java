@@ -1,6 +1,7 @@
 package GUI;
 
 import BUS.EditorHandler;
+import GUI.components.AddTabDialog;
 import GUI.components.CodeEditor;
 import GUI.components.Console;
 import GUI.components.CustomTab;
@@ -15,40 +16,38 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 public class Editor extends JFrame{
     private EditorHandler editorHandler;
 
     // GUI
     private int numTabs = 0;
-    private JTabbedPane tabbedPane;
+    public JTabbedPane tabbedPane;
 
     private CodeEditor codeEditor;
     private Console console;
     private Language currentLanguage = Language.JAVA;
     private JMenu menuLanguage;
 
-    private JDialog dialog;
+    private AddTabDialog addTabDialog;
     private JMenuBar menuBar;
 
     public Editor() {
 
-        dialog = new JDialog(this,"Confirm");
-        dialog.pack();
+        addTabDialog = new AddTabDialog(this);
+        addTabDialog.setLocationRelativeTo(this);
 
         menuBar = createMenuBar();
         codeEditor = new CodeEditor(Language.JAVA);
         console = new Console();
 
         createTabbedPane();
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(0,1));
-        mainPanel.add(tabbedPane);
-        mainPanel.add(console);
         console.addText("Connecting to server ...");
 
-        getContentPane().add(mainPanel);
+        JSplitPane splitPane = new JSplitPane(SwingConstants.HORIZONTAL, tabbedPane,console);
+        splitPane.setResizeWeight(0.7);
+
+        getContentPane().add(splitPane);
 
         setJMenuBar(menuBar);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -161,91 +160,27 @@ public class Editor extends JFrame{
     }
 
     private void openAddTabDialog () {
-        JPanel p = new JPanel();
 
-        // create a label
-        JLabel l = new JLabel("this is first dialog box");
-        p.add(l);
-
-        // create input name
-        JTextField nameTxt = new JTextField("Java_"+numTabs);
-        p.add(nameTxt);
-
-        // create checkbox
-        ComboItem[] listItem = new ComboItem[] {
-            new ComboItem(Language.JAVA, "Java", "JavaExample.txt"),
-            new ComboItem(Language.CPP, "C++", "CppExample.txt"),
-            new ComboItem(Language.PYTHON, "Python", "PythonExample.txt"),
-            new ComboItem(Language.CSHARP, "C#", "CSharpExample.txt"),
-        };
-
-        JComboBox<ComboItem> c1 = new JComboBox<ComboItem>(listItem);
-        p.add(c1);
-
-        // create a button
-        JButton yesBtn = new JButton("Yes");
-        p.add(yesBtn);
-        JButton closeBtn = new JButton("Close");
-        p.add(closeBtn);
-
-        ActionListener actionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String btn = e.getActionCommand();
-                ComboItem selectItem = (ComboItem) c1.getSelectedItem();
-                Language language = selectItem.getLanguage();
-                String res = selectItem.getRes();
-                String name = nameTxt.getText();
-                switch (btn) {
-                    case "Yes":
-                        addTab(name, language, res);
-                        break;
-                    case "Close":
-
-                        break;
-                }
-                dialog.dispose();
-            }
-        };
-
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                tabbedPane.setSelectedIndex(numTabs - 2);
-                dialog = new JDialog();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-                tabbedPane.setSelectedIndex(numTabs - 2);
-                dialog = new JDialog();
-            }
-        });
-
-        // add Action Listener
-        yesBtn.addActionListener(actionListener);
-        closeBtn.addActionListener(actionListener);
-        // add panel to dialog
-        dialog.add(p);
         // set size of dialog
-        dialog.setSize(200, 200);
+        addTabDialog.setSize(400, 200);
 
         // set visibility of dialog
-        dialog.setVisible(true);
+        addTabDialog.setVisible(true);
     }
 
-    public void addTab (String name, Language language, String res) {
+    public void addTab (String name, Language language, String style, String res) {
 
         CodeEditor codeEditor = new CodeEditor(language);
+        codeEditor.setSyntaxEditingStyle(style);
         int index = numTabs - 1;
         if (tabbedPane.getSelectedIndex() == index) { /* if click new tab */
             /* add new tab */
             tabbedPane.add(codeEditor, name, index);
             /* set tab is custom tab */
-            tabbedPane.setTabComponentAt(index, new CustomTab(this.tabbedPane, this));
             tabbedPane.removeChangeListener(changeListener);
             tabbedPane.setSelectedIndex(index);
             tabbedPane.addChangeListener(changeListener);
+            tabbedPane.setTabComponentAt(index, new CustomTab(this.tabbedPane, this));
             numTabs++;
 
 
@@ -295,37 +230,16 @@ public class Editor extends JFrame{
         this.console.addText("Server Connected !!");
     }
 
+    public int getNumTabs () {
+        return numTabs;
+    }
+
     public Console getConsole () {
         return console;
     }
 
     public void setText(String code) {
         codeEditor.setTextArea(code);
-    }
-
-    class ComboItem {
-        private Language language;
-        private String name;
-        private String res;
-
-        public ComboItem(Language language, String name, String res) {
-            this.language = language;
-            this.name = name;
-            this.res = res;
-        }
-
-        public Language getLanguage () {
-            return this.language;
-        }
-
-        public String getRes () {
-            return this.res;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
     }
 
     private class ChangeSyntaxStyleAction extends AbstractAction {

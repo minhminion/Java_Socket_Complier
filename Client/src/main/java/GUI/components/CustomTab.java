@@ -2,6 +2,7 @@ package GUI.components;
 
 import GUI.Editor;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -9,6 +10,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class CustomTab extends JPanel {
 
@@ -49,6 +53,7 @@ public class CustomTab extends JPanel {
         Color textColor = Color.decode("#ffffff");
         Color hoverTextColor = Color.decode("#00aced");
         Color hoverBackgroundColor = Color.decode("#00aced");
+
 
         public CustomButton(String text) {
             int size = 20;
