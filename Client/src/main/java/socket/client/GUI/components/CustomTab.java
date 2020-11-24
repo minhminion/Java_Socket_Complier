@@ -78,11 +78,19 @@ public class CustomTab extends JPanel {
         /** when click button, tab will close */
         @Override
         public void mouseClicked(MouseEvent e) {
-            int index = customJTabbedPane
-                    .indexOfTabComponent(CustomTab.this);
-            if (index != -1) {
-                editor.removeTab(index);
+            int inputConfirmDialog = JOptionPane.showConfirmDialog(null,
+                    "Do you want to close the tab?",
+                    "Select an Option", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+            if(inputConfirmDialog == 0){
+                int index = customJTabbedPane
+                        .indexOfTabComponent(CustomTab.this);
+                if (index != -1) {
+                    editor.removeTab(index);
+                }
+            }else{
+
             }
+
         }
 
         @Override
