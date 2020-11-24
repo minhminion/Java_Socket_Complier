@@ -28,4 +28,8 @@ public class Console extends JPanel {
     public void addText (String message) {
         textArea.append(message+"\n");
     }
+
+    public void clearScreen () {
+        textArea.setText("");
+    }
 }

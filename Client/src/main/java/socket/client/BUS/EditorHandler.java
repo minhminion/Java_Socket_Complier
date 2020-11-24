@@ -92,6 +92,7 @@ public class EditorHandler {
                         CompileResponse compileResponse = (CompileResponse) object;
                         if(editor != null) {
                             editor.setText(compileResponse.getCode());
+                            editor.getConsole().clearScreen();
                             editor.getConsole().addText(compileResponse.getOutput());
                         }
 //                        System.out.println( "After Formatter \n" +

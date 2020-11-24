@@ -3,9 +3,12 @@ package socket.client.GUI.components;
 import socket.client.GUI.Editor;
 import socket.commons.enums.Language;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import socket.commons.helpers.CommonHelpers;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
+import java.io.File;
 
 public class AddTabDialog extends JDialog {
     private Editor editor;
@@ -14,19 +17,22 @@ public class AddTabDialog extends JDialog {
     private JButton buttonCancel;
     private JTextField textField1;
     private JComboBox comboBox1;
+    private JButton orOpenFileFromButton;
 
     public AddTabDialog(Editor editor) {
         this.editor = editor;
+        String path = System.getProperty("user.dir")+"/Client/src/main/resources/";
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
         textField1.setText("New File");
 
-        comboBox1.addItem(new ComboItem(Language.JAVA, SyntaxConstants.SYNTAX_STYLE_JAVA,  "Java", "JavaExample.txt"));
-        comboBox1.addItem(new ComboItem(Language.CPP, SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS, "C++", "CppExample.txt"));
-        comboBox1.addItem(new ComboItem(Language.PYTHON, SyntaxConstants.SYNTAX_STYLE_PYTHON, "Python", "PythonExample.txt"));
-        comboBox1.addItem(new ComboItem(Language.CSHARP, SyntaxConstants.SYNTAX_STYLE_CSHARP, "C#", "CSharpExample.txt"));
+        comboBox1.addItem(new ComboItem(Language.JAVA, SyntaxConstants.SYNTAX_STYLE_JAVA,  "Java", path+"JavaExample.txt"));
+        comboBox1.addItem(new ComboItem(Language.CPP, SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS, "C++", path+"CppExample.txt"));
+        comboBox1.addItem(new ComboItem(Language.PYTHON, SyntaxConstants.SYNTAX_STYLE_PYTHON, "Python", path+"PythonExample.txt"));
+        comboBox1.addItem(new ComboItem(Language.CSHARP, SyntaxConstants.SYNTAX_STYLE_CSHARP, "C#", path+"CsharpExample.txt"));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -39,6 +45,46 @@ public class AddTabDialog extends JDialog {
                 onCancel();
             }
         });
+
+        orOpenFileFromButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame parentFrame = new JFrame();
+
+                FileNameExtensionFilter fileFilter = new FileNameExtensionFilter(
+                        "Choose a programming language file",
+                        "cs",
+                        "java",
+                        "py",
+                        "c",
+                        "cpp");
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Choose a file to open");
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.setFileFilter(fileFilter);
+
+                int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
+
+                    String newFileAbsolutePath = fileToSave.getAbsolutePath();
+                    Language newFileLanguage = CommonHelpers.getLanguageFromFilePath(newFileAbsolutePath);
+                    String newFileSyntaxStyle = editor.getLanguageSyntaxStyle(newFileLanguage);
+
+                    /** Create new tab for new file */
+                    editor.addTab(
+                            fileToSave.getName(),
+                            newFileLanguage,
+                            newFileSyntaxStyle,
+                            newFileAbsolutePath);
+
+                    closeDialog();
+                }
+            }
+        });
+
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

@@ -8,18 +8,21 @@ import socket.client.GUI.components.CustomTab;
 import socket.commons.enums.Language;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import socket.commons.helpers.CommonHelpers;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class Editor extends JFrame{
     private EditorHandler editorHandler;
-
+    private static String directoryPath = System.getProperty("user.dir")+"/Client/src/main/resources/";
     // GUI
     private int numTabs = 0;
     public JTabbedPane tabbedPane;
@@ -51,7 +54,7 @@ public class Editor extends JFrame{
 
         setJMenuBar(menuBar);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        codeEditor.setText("JavaExample.txt");
+        codeEditor.setText(directoryPath+"JavaExample.txt");
         pack();
         setTitle("Banana Boys Compiler");
     }
@@ -76,15 +79,16 @@ public class Editor extends JFrame{
         JMenuBar mb = new JMenuBar();
 
         // Menu File
-        JMenu menu =new JMenu("File");
+        JMenu menu = new JMenu("File");
         JMenuItem menuItem;
         KeyStroke keyStroke;
-        menuItem=new JMenuItem("Open File");
+
+        menuItem = new JMenuItem(new OpenFileAction());
         keyStroke = KeyStroke.getKeyStroke("control O");
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
 
-        menuItem =new JMenuItem("New File");
+        menuItem = new JMenuItem("New File");
         keyStroke = KeyStroke.getKeyStroke("control N");
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
@@ -94,10 +98,10 @@ public class Editor extends JFrame{
         // Menu Language
         menu = new JMenu("Language");
         ButtonGroup bg = new ButtonGroup();
-        addSyntaxItem(Language.JAVA, "Java","JavaExample.txt", SyntaxConstants.SYNTAX_STYLE_JAVA, bg, menu);
-        addSyntaxItem(Language.CPP, "C++","CppExample.txt", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS, bg, menu);
-        addSyntaxItem(Language.PYTHON, "Python","PythonExample.txt", SyntaxConstants.SYNTAX_STYLE_PYTHON, bg, menu);
-        addSyntaxItem(Language.CSHARP, "C#","CSharpExample.txt", SyntaxConstants.SYNTAX_STYLE_CSHARP, bg, menu);
+        addSyntaxItem(Language.JAVA, "Java",directoryPath+"JavaExample.txt", SyntaxConstants.SYNTAX_STYLE_JAVA, bg, menu);
+        addSyntaxItem(Language.CPP, "C++",directoryPath+"CppExample.txt", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS, bg, menu);
+        addSyntaxItem(Language.PYTHON, "Python",directoryPath+"PythonExample.txt", SyntaxConstants.SYNTAX_STYLE_PYTHON, bg, menu);
+        addSyntaxItem(Language.CSHARP, "C#",directoryPath+"CSharpExample.txt", SyntaxConstants.SYNTAX_STYLE_CSHARP, bg, menu);
         menu.getItem(0).setSelected(true);
 
         mb.add(menu);
@@ -120,7 +124,7 @@ public class Editor extends JFrame{
 
         // Menu Run
         menu = new JMenu("Run");
-        menuItem=new JMenuItem(new CompileCodeAction());
+        menuItem = new JMenuItem(new CompileCodeAction());
         keyStroke = KeyStroke.getKeyStroke("shift F10");
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
@@ -173,22 +177,20 @@ public class Editor extends JFrame{
         CodeEditor codeEditor = new CodeEditor(language);
         codeEditor.setSyntaxEditingStyle(style);
         int index = numTabs - 1;
-        if (tabbedPane.getSelectedIndex() == index) { /* if click new tab */
-            /* add new tab */
-            tabbedPane.add(codeEditor, name, index);
-            /* set tab is custom tab */
-            tabbedPane.removeChangeListener(changeListener);
-            tabbedPane.setSelectedIndex(index);
-            tabbedPane.addChangeListener(changeListener);
-            tabbedPane.setTabComponentAt(index, new CustomTab(this.tabbedPane, this));
-            numTabs++;
+        /* add new tab */
+        tabbedPane.add(codeEditor, name, index);
+        /* set tab is custom tab */
+        tabbedPane.removeChangeListener(changeListener);
+        tabbedPane.setSelectedIndex(index);
+        tabbedPane.addChangeListener(changeListener);
+        tabbedPane.setTabComponentAt(index, new CustomTab(this.tabbedPane, this));
+        numTabs++;
 
 
-            this.currentLanguage = language;
-            setSelectMenuLanguage(language);
-            codeEditor.setText(res);
-            this.codeEditor = codeEditor;
-        }
+        this.currentLanguage = language;
+        setSelectMenuLanguage(language);
+        codeEditor.setText(res);
+        this.codeEditor = codeEditor;
     }
 
     public void removeTab(int index) {
@@ -299,10 +301,82 @@ public class Editor extends JFrame{
         public void actionPerformed(ActionEvent event) {
             if(editorHandler != null) {
                 String code = codeEditor.getTextArea().getText();
+                console.clearScreen();
+                console.addText("Compiling........");
                 editorHandler.compileCode(currentLanguage, code);
             }
         }
     }
 
+    public class OpenFileAction extends AbstractAction {
 
+        public OpenFileAction() {
+            putValue(NAME, "Open File");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            JFrame parentFrame = new JFrame();
+
+            FileNameExtensionFilter fileFilter = new FileNameExtensionFilter(
+                    "Choose a programming language file",
+                    "cs",
+                    "java",
+                    "py",
+                    "c",
+                    "cpp");
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Choose a file to open");
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            fileChooser.setFileFilter(fileFilter);
+
+            int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+
+                String newFileAbsolutePath = fileToSave.getAbsolutePath();
+                Language newFileLanguage = CommonHelpers.getLanguageFromFilePath(newFileAbsolutePath);
+                String newFileSyntaxStyle = getLanguageSyntaxStyle(newFileLanguage);
+
+                /** Create new tab for new file */
+                addTab(
+                        fileToSave.getName(),
+                        newFileLanguage,
+                        newFileSyntaxStyle,
+                        newFileAbsolutePath);
+            }
+        }
+    }
+
+    public String getLanguageSyntaxStyle(Language language)
+    {
+        String style = null;
+
+        switch (language)
+        {
+            case JAVA: {
+                style = SyntaxConstants.SYNTAX_STYLE_JAVA;
+                break;
+            }
+
+            case CPP: {
+                style = SyntaxConstants.SYNTAX_STYLE_C;
+                break;
+            }
+            case PYTHON: {
+                style = SyntaxConstants.SYNTAX_STYLE_PYTHON;
+                break;
+            }
+            case CSHARP: {
+                style = SyntaxConstants.SYNTAX_STYLE_CSHARP;
+                break;
+            }
+
+            default: break;
+        }
+
+        return style;
+    }
 }

@@ -9,10 +9,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class CodeEditor extends JRootPane implements HyperlinkListener,
@@ -71,8 +68,9 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
     public void setText(String resource) {
         BufferedReader r;
         try {
-            r = new BufferedReader(new InputStreamReader(
-                    getClass().getResourceAsStream("/"+resource), StandardCharsets.UTF_8));
+//            r = new BufferedReader(new InputStreamReader(
+//                    getClass().getResourceAsStream("/"+resource), StandardCharsets.UTF_8));
+            r = new BufferedReader(new FileReader(resource));
             textArea.read(r, null);
             r.close();
             textArea.setCaretPosition(0);

@@ -3,8 +3,9 @@ import socket.client.GUI.Editor;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;
+import java.nio.file.Paths;
 
-public class Main {
+public class ClientLauncher {
     public static void main(String args[]) {
         SwingUtilities.invokeLater(() -> {
             try {
