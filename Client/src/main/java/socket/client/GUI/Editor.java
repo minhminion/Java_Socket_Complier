@@ -88,7 +88,7 @@ public class Editor extends JFrame{
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
 
-        menuItem = new JMenuItem("New File");
+        menuItem = new JMenuItem(new NewFileAction());
         keyStroke = KeyStroke.getKeyStroke("control N");
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
@@ -347,6 +347,18 @@ public class Editor extends JFrame{
                         newFileSyntaxStyle,
                         newFileAbsolutePath);
             }
+        }
+    }
+
+    private class NewFileAction extends AbstractAction {
+
+        NewFileAction() {
+            putValue(NAME, "New File");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            openAddTabDialog();
         }
     }
 
