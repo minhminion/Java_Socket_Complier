@@ -1,10 +1,8 @@
 package socket.client.GUI;
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import socket.client.BUS.EditorHandler;
-import socket.client.GUI.components.AddTabDialog;
-import socket.client.GUI.components.CodeEditor;
-import socket.client.GUI.components.Console;
-import socket.client.GUI.components.CustomTab;
+import socket.client.GUI.components.*;
 import socket.commons.enums.Language;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -17,6 +15,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -90,6 +89,11 @@ public class Editor extends JFrame{
 
         menuItem = new JMenuItem(new NewFileAction());
         keyStroke = KeyStroke.getKeyStroke("control N");
+        menuItem.setAccelerator(keyStroke);
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem(new SaveFileAction());
+        keyStroke = KeyStroke.getKeyStroke("control S");
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
 
@@ -359,6 +363,41 @@ public class Editor extends JFrame{
         @Override
         public void actionPerformed(ActionEvent event) {
             openAddTabDialog();
+        }
+    }
+    private class SaveFileAction extends AbstractAction {
+
+        SaveFileAction() {
+            putValue(NAME, "Save File");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");
+
+            fileChooser.setFileFilter(new FileTypeFilter(".java", "Java"));
+            fileChooser.setFileFilter(new FileTypeFilter(".cpp", "C++"));
+            fileChooser.setFileFilter(new FileTypeFilter(".py", "Python"));
+            fileChooser.setFileFilter(new FileTypeFilter(".cs", "C#"));
+            fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
+
+            int userSelection = fileChooser.showSaveDialog(null);
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+
+                File fi = fileChooser.getSelectedFile();
+                try {
+                    String code = codeEditor.getTextArea().getText();
+
+                    FileWriter fw = new FileWriter(fi.getPath());
+                    fw.write(code);
+                    fw.flush();
+                    fw.close();
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage());
+                }
+
+            }
         }
     }
 
