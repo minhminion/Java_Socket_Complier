@@ -41,7 +41,7 @@ public class Editor extends JFrame{
         addTabDialog.setLocationRelativeTo(this);
 
         menuBar = createMenuBar();
-        codeEditor = new CodeEditor(Language.JAVA);
+        codeEditor = new CodeEditor(Language.JAVA, new CompileCodeAction());
         console = new Console();
 
         createTabbedPane();
@@ -174,7 +174,7 @@ public class Editor extends JFrame{
 
     public void addTab (String name, Language language, String style, String res) {
 
-        CodeEditor codeEditor = new CodeEditor(language);
+        CodeEditor codeEditor = new CodeEditor(language, new CompileCodeAction());
         codeEditor.setSyntaxEditingStyle(style);
         int index = numTabs - 1;
         /* add new tab */
@@ -291,7 +291,7 @@ public class Editor extends JFrame{
 
     }
 
-    private class CompileCodeAction extends AbstractAction {
+    public class CompileCodeAction extends AbstractAction {
 
         CompileCodeAction() {
             putValue(NAME, "Compile");

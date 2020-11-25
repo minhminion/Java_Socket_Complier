@@ -1,5 +1,6 @@
 package socket.client.GUI.components;
 
+import socket.client.GUI.Editor;
 import socket.commons.enums.Language;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -14,14 +15,20 @@ import java.nio.charset.StandardCharsets;
 
 public class CodeEditor extends JRootPane implements HyperlinkListener,
         SyntaxConstants {
+    private Editor.CompileCodeAction compileCodeAction;
     private Language language;
     private RTextScrollPane scrollPane;
     private RSyntaxTextArea textArea;
 
-    public CodeEditor(Language language) {
+    public CodeEditor(Language language, Editor.CompileCodeAction compileCodeAction) {
         this.language = language;
         textArea = createTextArea();
         textArea.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
+        JPopupMenu popup = textArea.getPopupMenu();
+
+        popup.addSeparator();
+        popup.add(new JMenuItem(compileCodeAction));
+
         scrollPane = new RTextScrollPane(textArea, true);
         getContentPane().add(scrollPane);
         ErrorStrip errorStrip = new ErrorStrip(textArea);
