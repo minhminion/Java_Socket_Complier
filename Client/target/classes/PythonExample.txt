@@ -1,2 +1,0 @@
-# Code here
-print("This line will be printed.")
