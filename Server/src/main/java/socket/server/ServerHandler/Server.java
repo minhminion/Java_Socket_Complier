@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static socket.commons.enums.Action.*;
+
 public class Server {
     private ServerSocket serverSocket;
     private Map<String, ClientHandler> clientHandlers;
@@ -117,6 +119,22 @@ public class Server {
                                 this.response(CompileResponse.builder()
                                         .code(formattedCode)
                                         .output(outputCompile)
+                                        .statusCode(StatusCode.OK)
+                                        .build());
+                            }
+                            break;
+                        case FORMAT_CODE:
+                            CompileRequest formatRequest = (CompileRequest) request;
+                            String dataCode = formatRequest.getCode();
+                            String responseCode;
+                            String languageCode = getLanguage(formatRequest.getLanguage());
+
+                            if(dataCode != null || languageCode != null ) {
+                                APIRequest apiRequest = new APIRequest();
+                                String formattedCode = apiRequest.formatCode(dataCode, languageCode);
+                                this.response(CompileResponse.builder()
+                                        .code(formattedCode)
+                                        .output("Fomat Code Success")
                                         .statusCode(StatusCode.OK)
                                         .build());
                             }

@@ -73,6 +73,18 @@ public class EditorHandler {
             e.printStackTrace();
         }
     }
+    public void formatCode(Language currentLanguage, String code) {
+        try {
+            sendRequest(CompileRequest
+                    .builder()
+                    .action(Action.FORMAT_CODE)
+                    .code(code)
+                    .language(currentLanguage)
+                    .build());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Create a thread to listen response
     private class ResponseProcess extends Thread {

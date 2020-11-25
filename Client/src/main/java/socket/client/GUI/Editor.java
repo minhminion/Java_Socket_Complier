@@ -40,7 +40,7 @@ public class Editor extends JFrame{
         addTabDialog.setLocationRelativeTo(this);
 
         menuBar = createMenuBar();
-        codeEditor = new CodeEditor(Language.JAVA, new CompileCodeAction());
+        codeEditor = new CodeEditor(Language.JAVA, new CompileCodeAction(), new FormatCodeAction());
         console = new Console();
 
         createTabbedPane();
@@ -133,6 +133,11 @@ public class Editor extends JFrame{
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
 
+        menuItem = new JMenuItem(new FormatCodeAction());
+        keyStroke = KeyStroke.getKeyStroke("shift F9");
+        menuItem.setAccelerator(keyStroke);
+        menu.add(menuItem);
+
         mb.add(menu);
 
         return mb;
@@ -178,7 +183,7 @@ public class Editor extends JFrame{
 
     public void addTab (String name, Language language, String style, String res) {
 
-        CodeEditor codeEditor = new CodeEditor(language, new CompileCodeAction());
+        CodeEditor codeEditor = new CodeEditor(language, new CompileCodeAction(), new FormatCodeAction());
         codeEditor.setSyntaxEditingStyle(style);
         int index = numTabs - 1;
         /* add new tab */
@@ -308,6 +313,23 @@ public class Editor extends JFrame{
                 console.clearScreen();
                 console.addText("Compiling........");
                 editorHandler.compileCode(currentLanguage, code);
+            }
+        }
+    }
+    public class FormatCodeAction extends AbstractAction {
+
+        FormatCodeAction() {
+            putValue(NAME, "Format Code");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            if(editorHandler != null) {
+                String code = codeEditor.getTextArea().getText();
+                console.clearScreen();
+                console.addText("Formating........");
+//                editorHandler.compileCode(currentLanguage, code);
+                editorHandler.formatCode(currentLanguage, code);
             }
         }
     }

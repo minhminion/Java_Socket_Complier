@@ -20,7 +20,7 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
     private RTextScrollPane scrollPane;
     private RSyntaxTextArea textArea;
 
-    public CodeEditor(Language language, Editor.CompileCodeAction compileCodeAction) {
+    public CodeEditor(Language language, Editor.CompileCodeAction compileCodeAction, Editor.FormatCodeAction formatCodeAction) {
         this.language = language;
         textArea = createTextArea();
         textArea.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
@@ -28,6 +28,8 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
 
         popup.addSeparator();
         popup.add(new JMenuItem(compileCodeAction));
+        popup.addSeparator();
+        popup.add(new JMenuItem(formatCodeAction));
 
         scrollPane = new RTextScrollPane(textArea, true);
         getContentPane().add(scrollPane);
