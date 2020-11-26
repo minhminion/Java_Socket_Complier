@@ -28,11 +28,22 @@ public class APIRequest {
 
     public String formatCode (String code, String language) {
         try {
-            if(language.equals("java")) language = "javascript";
-            if(language.equals("cpp")) language = "c";
+            String formatLanguage = language;
+            switch (language) {
+                case "java":
+                case "csharp":
+                    formatLanguage = "javascript";
+                    break;
+                case "cpp":
+                    formatLanguage = "c";
+                    break;
+                default:
+                    break;
+            }
+
             CloseableHttpClient httpclient = HttpClients.createDefault();
             //Creating a HttpGet object
-            HttpPost httpPost = new HttpPost("https://tools.tutorialspoint.com/format_"+language+".php");
+            HttpPost httpPost = new HttpPost("https://tools.tutorialspoint.com/format_"+formatLanguage+".php");
             //Add form data
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("code", code));
@@ -56,7 +67,11 @@ public class APIRequest {
 
     public String compileCode (String code, String language) {
         try {
-            if(language.equals("python")) language = language+"3";
+            int version = 3;
+            if(language.equals("python")) {
+                language = language+"2";
+                version = 2;
+            }
             CloseableHttpClient httpclient = HttpClients.createDefault();
             System.out.println(code);
             //Creating a HttpGet object
@@ -72,7 +87,7 @@ public class APIRequest {
 //                                                .replaceAll("\\n", "\n")
                                                 +"\","+
                                 "\"language\":\""+language+"\","+
-                                "\"versionIndex\":\""+"3\""+
+                                "\"versionIndex\":\""+version+"\""+
                                 "}";
             StringEntity entity = new StringEntity(postJson);
             System.out.println(postJson);

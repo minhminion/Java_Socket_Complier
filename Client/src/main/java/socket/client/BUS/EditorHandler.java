@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 
 public class EditorHandler {
@@ -21,6 +22,7 @@ public class EditorHandler {
     private Socket clientSocket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+    private long startTime;
 
     public EditorHandler(Editor editor) {
         this.editor = editor;
@@ -63,6 +65,7 @@ public class EditorHandler {
 
     public void compileCode(Language currentLanguage, String code) {
         try {
+            this.startTime = System.nanoTime();
             sendRequest(CompileRequest
                         .builder()
                         .action(Action.COMPILE_CODE)
@@ -75,6 +78,7 @@ public class EditorHandler {
     }
     public void formatCode(Language currentLanguage, String code) {
         try {
+            this.startTime = System.nanoTime();
             sendRequest(CompileRequest
                     .builder()
                     .action(Action.FORMAT_CODE)
@@ -105,6 +109,8 @@ public class EditorHandler {
                         if(editor != null) {
                             editor.setText(compileResponse.getCode());
                             editor.getConsole().clearScreen();
+                            long duration = (System.nanoTime() - startTime);
+                            editor.getConsole().addText("TIME EXECUTE: "+(double) duration / 1_000_000_000+" seconds");
                             editor.getConsole().addText(compileResponse.getOutput());
                         }
 //                        System.out.println( "After Formatter \n" +

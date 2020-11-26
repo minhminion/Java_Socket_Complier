@@ -111,17 +111,17 @@ public class AddTabDialog extends JDialog {
         String style = selectItem.getStyle();
         String res = selectItem.getRes();
         String name = textField1.getText();
-        if(language.toString().equals("JAVA")==true){
-            name+=".java";
+        if (language.toString().equals("JAVA") == true) {
+            name += ".java";
         }
-        if(language.toString().equals("CPP")==true){
-            name+=".cpp";
+        if (language.toString().equals("CPP") == true) {
+            name += ".cpp";
         }
-        if(language.toString().equals("PYTHON")==true){
-            name+=".py";
+        if (language.toString().equals("PYTHON") == true) {
+            name += ".py";
         }
-        if(language.toString().equals("CSHARP")==true){
-            name+=".cs";
+        if (language.toString().equals("CSHARP") == true) {
+            name += ".cs";
         }
 
         editor.addTab(name, language, style, res);
