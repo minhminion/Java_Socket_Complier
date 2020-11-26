@@ -81,6 +81,9 @@ public class Server {
                 case PYTHON:
                     language = "python";
                     break;
+                case CSHARP:
+                    language = "csharp";
+                    break;
                 default:
                     break;
             }

@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-namespace ConsoleApp1
+
+class Program
 {
-    class Program{
-        static void ServerLauncher(string[] args){
-            Console.WriteLine("Hello, world!");
-            Console.ReadLine();
-        }
+    static void Main() {
+        int x = 10;
+        int y = 25;
+        int z = x + y;
+
+        Console.Write("Sum of x + y = "+ z);
     }
 }
