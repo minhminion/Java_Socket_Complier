@@ -164,7 +164,8 @@ public class Editor extends JFrame{
         this.tabbedPane = new JTabbedPane();
         JComponent panel1 = codeEditor;
 
-        tabbedPane.add(panel1, "Java 1", numTabs++);
+        tabbedPane.add(panel1, "Java 1.java", numTabs++);
+        codeEditor.setNameFile("Java 1.java");
         tabbedPane.setTabComponentAt(0, new CustomTab(tabbedPane, this));
 
         tabbedPane.add(null, "+", numTabs++);
@@ -200,6 +201,7 @@ public class Editor extends JFrame{
         setSelectMenuLanguage(language);
         codeEditor.setText(res);
         this.codeEditor = codeEditor;
+        codeEditor.setNameFile(name);
     }
 
     public void removeTab(int index) {
@@ -397,6 +399,8 @@ public class Editor extends JFrame{
         public void actionPerformed(ActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Specify a file to save");
+//            fileChooser.setSelectedFile(new File("fileToSave.txt"));
+            fileChooser.setSelectedFile(new File(codeEditor.getNameFile()));
 
             fileChooser.setFileFilter(new FileTypeFilter(".java", "Java"));
             fileChooser.setFileFilter(new FileTypeFilter(".cpp", "C++"));

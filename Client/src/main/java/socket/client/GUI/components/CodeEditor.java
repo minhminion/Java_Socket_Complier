@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 
 public class CodeEditor extends JRootPane implements HyperlinkListener,
         SyntaxConstants {
+    private String nameFile;
     private Editor.CompileCodeAction compileCodeAction;
     private Language language;
     private RTextScrollPane scrollPane;
@@ -37,6 +38,9 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
         getContentPane().add(errorStrip, BorderLayout.LINE_END);
 
         setTheme("dark.xml");
+    }
+    public CodeEditor(String nameFile){
+        this.nameFile = nameFile;
     }
 
     private RSyntaxTextArea createTextArea () {
@@ -89,6 +93,14 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
         } catch (Exception e) { // Never happens
             textArea.setText("Type here to see syntax highlighting");
         }
+    }
+
+    public String getNameFile() {
+        return nameFile;
+    }
+
+    public void setNameFile(String nameFile) {
+        this.nameFile = nameFile;
     }
 
     public void setLanguage (Language language) {
