@@ -9,6 +9,7 @@ import socket.commons.response.CompileResponse;
 import socket.commons.response.MessageResponse;
 import org.apache.commons.lang3.ObjectUtils;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -33,6 +34,10 @@ public class EditorHandler {
         this.out.flush();
     }
 
+    public String helpReconnectMessage () {
+        return "To Reconnect: Help -> Reconnect";
+    }
+
     public void startConnection(String ip, int port) {
         try {
 //          Create Client socket
@@ -49,6 +54,7 @@ public class EditorHandler {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(editor, "Can't connect to server \n"+helpReconnectMessage(), "Error ",JOptionPane.ERROR_MESSAGE);
             editor.getConsole().addText("Can't connect to server");
         }
     }
@@ -128,6 +134,7 @@ public class EditorHandler {
                     disconnect();
                 } catch (IOException ex) {
                 }
+                JOptionPane.showMessageDialog(editor, "Disconnect to server \n"+helpReconnectMessage(), "Error ",JOptionPane.ERROR_MESSAGE);
                 editor.getConsole().addText("Disconnect to server !");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -135,6 +142,7 @@ public class EditorHandler {
                     disconnect();
                 } catch (IOException ex) {
                 }
+                JOptionPane.showMessageDialog(editor, "Disconnect to server \n"+helpReconnectMessage(), "Error ",JOptionPane.ERROR_MESSAGE);
                 editor.getConsole().addText("Disconnect to server !");
             }
         }
