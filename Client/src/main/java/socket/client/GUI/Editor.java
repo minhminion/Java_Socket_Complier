@@ -144,6 +144,11 @@ public class Editor extends JFrame{
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
 
+        menu = new JMenu("Help");
+        menuItem = new JMenuItem(new ReconnectAction());
+        menuItem.setAccelerator(keyStroke);
+        menu.add(menuItem);
+
         mb.add(menu);
 
         return mb;
