@@ -2,6 +2,7 @@ package socket.client.GUI.components;
 
 import socket.client.GUI.Editor;
 import socket.commons.enums.Language;
+import org.fife.ui.autocomplete.*;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
@@ -25,6 +26,12 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
         this.language = language;
         textArea = createTextArea();
         textArea.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
+
+        // Install Auto Complete for TextArea
+        CompletionProvider provider = createCompletionProvider();
+        AutoCompletion ac = new AutoCompletion(provider);
+        ac.install(textArea);
+
         JPopupMenu popup = textArea.getPopupMenu();
 
         popup.addSeparator();
@@ -76,6 +83,39 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    private CompletionProvider createCompletionProvider() {
+
+        // A DefaultCompletionProvider is the simplest concrete implementation
+        // of CompletionProvider. This provider has no understanding of
+        // language semantics. It simply checks the text entered up to the
+        // caret position for a match against known completions. This is all
+        // that is needed in the majority of cases.
+        DefaultCompletionProvider provider = new DefaultCompletionProvider();
+
+        // Add completions for all Java keywords. A BasicCompletion is just
+        // a straightforward word completion.
+        provider.addCompletion(new BasicCompletion(provider, "abstract"));
+        provider.addCompletion(new BasicCompletion(provider, "assert"));
+        provider.addCompletion(new BasicCompletion(provider, "break"));
+        provider.addCompletion(new BasicCompletion(provider, "case"));
+        // ... etc ...
+        provider.addCompletion(new BasicCompletion(provider, "transient"));
+        provider.addCompletion(new BasicCompletion(provider, "try"));
+        provider.addCompletion(new BasicCompletion(provider, "void"));
+        provider.addCompletion(new BasicCompletion(provider, "volatile"));
+        provider.addCompletion(new BasicCompletion(provider, "while"));
+
+        // Add a couple of "shorthand" completions. These completions don't
+        // require the input text to be the same thing as the replacement text.
+        provider.addCompletion(new ShorthandCompletion(provider, "sout",
+                "System.out.println(", "System.out.println("));
+        provider.addCompletion(new ShorthandCompletion(provider, "syserr",
+                "System.err.println(", "System.err.println("));
+
+        return provider;
+
     }
 
     public void setText(String resource) {

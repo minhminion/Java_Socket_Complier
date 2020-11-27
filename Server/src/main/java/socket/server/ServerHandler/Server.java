@@ -35,12 +35,14 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println(serverSocket.getLocalSocketAddress().toString());
+            System.out.println(serverSocket.getInetAddress().getHostAddress().toString());
+
             while (true) {
                 ClientHandler clientHandler = new ClientHandler(serverSocket.accept());
                 clientHandler.start();
                 String clientUid = clientHandler.getUid();
-                System.out.println(clientHandler.clientSocket.getLocalSocketAddress().toString());
-                System.out.println("Connected to Client ["+clientUid+"]");
+                String address = clientHandler.clientSocket.getLocalSocketAddress().toString();
+                System.out.println("Connected to Client ["+clientUid+"] on " + address.substring(1));
                 this.clientHandlers.put(clientUid, clientHandler);
             }
         } catch (IOException e) {
@@ -97,6 +99,7 @@ public class Server {
                 Object input = in.readObject();
                 if(ObjectUtils.isNotEmpty(input)) {
                     Request request = (Request) input;
+                    System.out.println("[Client "+uid+"] Request to "+request.getAction().name());
                     switch (request.getAction()) {
                         case DISCONNECT:
                             clientHandlers.remove(this.getUid());
@@ -137,7 +140,7 @@ public class Server {
                                 String formattedCode = apiRequest.formatCode(dataCode, languageCode);
                                 this.response(CompileResponse.builder()
                                         .code(formattedCode)
-                                        .output("Fomat Code Success")
+                                        .output("Format Code Success")
                                         .statusCode(StatusCode.OK)
                                         .build());
                             }

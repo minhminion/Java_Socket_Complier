@@ -73,7 +73,7 @@ public class APIRequest {
                 version = 2;
             }
             CloseableHttpClient httpclient = HttpClients.createDefault();
-            System.out.println(code);
+//            System.out.println(code);
             //Creating a HttpGet object
             HttpPost httpPost = new HttpPost("https://api.jdoodle.com/v1/execute");
             httpPost.addHeader("Accept", "application/json");
@@ -90,10 +90,10 @@ public class APIRequest {
                                 "\"versionIndex\":\""+version+"\""+
                                 "}";
             StringEntity entity = new StringEntity(postJson);
-            System.out.println(postJson);
+//            System.out.println(postJson);
             httpPost.setEntity(entity);
 
-            System.out.println(httpPost.getEntity());
+//            System.out.println(httpPost.getEntity());
             HttpResponse httpresponse = httpclient.execute(httpPost);
             Scanner sc = new Scanner(httpresponse.getEntity().getContent());
             String json = null;

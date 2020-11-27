@@ -47,6 +47,7 @@ public class EditorHandler {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            editor.getConsole().addText("Can't connect to server");
         }
     }
 
@@ -113,19 +114,23 @@ public class EditorHandler {
                             editor.getConsole().addText("TIME EXECUTE: "+(double) duration / 1_000_000_000+" seconds");
                             editor.getConsole().addText(compileResponse.getOutput());
                         }
-//                        System.out.println( "After Formatter \n" +
-//                                "=============== \n"+
-//                                compileResponse.getCode()+"\n"+
-//                                "===== [OUTPUT] =====\n"+
-//                                compileResponse.getOutput()
-//                        );
                     }
 
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                try {
+                    disconnect();
+                } catch (IOException ex) {
+                }
+                editor.getConsole().addText("Disconnect to server !");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+                try {
+                    disconnect();
+                } catch (IOException ex) {
+                }
+                editor.getConsole().addText("Disconnect to server !");
             }
         }
     }
@@ -134,4 +139,11 @@ public class EditorHandler {
         return clientSocket;
     }
 
+    public void disconnect () throws IOException {
+        if(!clientSocket.isClosed()) {
+            in.close();
+            out.close();
+            clientSocket.close();
+        }
+    }
 }

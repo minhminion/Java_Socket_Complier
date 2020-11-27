@@ -173,15 +173,28 @@ public class Editor extends JFrame{
         tabbedPane.addChangeListener(changeListener);
     }
 
-    private void openAddTabDialog () {
+    // === Dialog to Reconnect ===
+    public void showReconnectDialog () {
+        ReconnectDialog reconnectDialog = new ReconnectDialog(this);
 
+        reconnectDialog.setSize(400, 150);
+        reconnectDialog.setLocationRelativeTo(this);
+        reconnectDialog.setVisible(true);
+
+    }
+
+    public void reconnectServer (String ip) {
+        new EditorHandler(this).startConnection(ip, 5000);
+    }
+
+    // === Dialog to Add Tab ===
+    private void openAddTabDialog () {
         // set size of dialog
         addTabDialog.setSize(400, 200);
 
         // set visibility of dialog
         addTabDialog.setVisible(true);
     }
-
     public void addTab (String name, Language language, String style, String res) {
 
         CodeEditor codeEditor = new CodeEditor(language, new CompileCodeAction(), new FormatCodeAction());
@@ -195,7 +208,6 @@ public class Editor extends JFrame{
         tabbedPane.addChangeListener(changeListener);
         tabbedPane.setTabComponentAt(index, new CustomTab(this.tabbedPane, this));
         numTabs++;
-
 
         this.currentLanguage = language;
         setSelectMenuLanguage(language);
@@ -310,11 +322,13 @@ public class Editor extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if(editorHandler != null) {
+            if(editorHandler != null && !editorHandler.getClientSocket().isClosed()) {
                 String code = codeEditor.getTextArea().getText();
                 console.clearScreen();
                 console.addText("Compiling........");
                 editorHandler.compileCode(currentLanguage, code);
+            } else {
+               showReconnectDialog();
             }
         }
     }
@@ -326,12 +340,14 @@ public class Editor extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if(editorHandler != null) {
+            if(editorHandler != null && !editorHandler.getClientSocket().isClosed()) {
                 String code = codeEditor.getTextArea().getText();
                 console.clearScreen();
-                console.addText("Formating........");
+                console.addText("Formatting........");
 //                editorHandler.compileCode(currentLanguage, code);
                 editorHandler.formatCode(currentLanguage, code);
+            } else {
+                showReconnectDialog();
             }
         }
     }
@@ -377,7 +393,6 @@ public class Editor extends JFrame{
             }
         }
     }
-
     private class NewFileAction extends AbstractAction {
 
         NewFileAction() {
