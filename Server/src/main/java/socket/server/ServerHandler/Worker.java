@@ -1,126 +1,77 @@
 package socket.server.ServerHandler;
 
-import socket.commons.request.SendClientSecretKeyRequest;
-import socket.commons.response.RequestPublicKeyResponse;
-import socket.server.ApiHandler.APIRequest;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.ObjectUtils;
 import socket.commons.enums.Language;
 import socket.commons.enums.StatusCode;
 import socket.commons.request.CompileRequest;
 import socket.commons.request.MessageRequest;
 import socket.commons.request.Request;
+import socket.commons.request.SendClientSecretKeyRequest;
 import socket.commons.response.CompileResponse;
 import socket.commons.response.MessageResponse;
+import socket.commons.response.RequestPublicKeyResponse;
 import socket.commons.response.Response;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.ObjectUtils;
+import socket.server.ApiHandler.APIRequest;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.security.*;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.UUID;
 
-import static socket.commons.enums.Action.*;
+@Getter
+@Setter
+public class Worker implements Runnable {
+    public Socket clientSocket;
+    private String uid;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    private Key clientSecretKey;
 
-public class Server {
-    private ServerSocket serverSocket;
-    public static Vector <Worker> clientHandlers;
-    private MyKeyGenerator keyGen;
-    public static PublicKey publicKey;
-    public static PrivateKey privateKey;
-
-    public Server() {
-        clientHandlers = new Vector<>();
-        generateKeys();
+    public Worker(Socket clientSocket) throws IOException{
+        this.clientSocket = clientSocket;
+        out = new ObjectOutputStream(clientSocket.getOutputStream());
+        in = new ObjectInputStream(clientSocket.getInputStream());
+        this.uid = UUID.randomUUID().toString();
     }
 
-    public void generateKeys() {
+    private void response(Response response) throws IOException {
+        this.out.writeObject(response);
+        this.out.flush();
+    }
+
+    private String getLanguage (Language languageType) {
+        String language = null;
+        switch (languageType) {
+            case JAVA:
+                language = "java";
+                break;
+            case CPP:
+                language = "cpp";
+                break;
+            case PYTHON:
+                language = "python";
+                break;
+            case CSHARP:
+                language = "csharp";
+                break;
+            default:
+                break;
+        }
+        return language;
+    }
+
+    @Override
+    public void run () {
         try {
-            keyGen = new MyKeyGenerator(2048);
-            keyGen.createKeys();
-
-            this.publicKey = keyGen.getPublicKey();
-            this.privateKey = keyGen.getPrivateKey();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void start(int port) {
-        System.out.println("Server Starting !!!");
-        ExecutorService executor = Executors.newCachedThreadPool();
-
-        try {
-            serverSocket = new ServerSocket(port);
-            System.out.println(serverSocket.getLocalSocketAddress().toString());
-            System.out.println(serverSocket.getInetAddress().getHostAddress().toString());
-
-            while (true) {
-                Worker clientHandler = new Worker(serverSocket.accept());
-                String clientUid = clientHandler.getUid();
-                String address = clientHandler.clientSocket.getLocalSocketAddress().toString();
-                System.out.println("Connected to Client ["+clientUid+"] on " + address.substring(1));
-                clientHandlers.add(clientHandler);
-                executor.execute(clientHandler);
-            }
-        } catch (IOException e) {
-
-        }
-    }
-
-
-    @Getter
-    @Setter
-    private class ClientHandler extends Thread{
-        private Socket clientSocket;
-        private String uid;
-        private ObjectOutputStream out;
-        private ObjectInputStream in;
-        private Key clientSecretKey;
-
-        public ClientHandler(Socket clientSocket) throws IOException{
-            this.clientSocket = clientSocket;
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            this.uid = UUID.randomUUID().toString();
-        }
-
-        private void response(Response response) throws IOException {
-            this.out.writeObject(response);
-            this.out.flush();
-        }
-
-        private String getLanguage (Language languageType) {
-            String language = null;
-            switch (languageType) {
-                case JAVA:
-                    language = "java";
-                    break;
-                case CPP:
-                    language = "cpp";
-                    break;
-                case PYTHON:
-                    language = "python";
-                    break;
-                case CSHARP:
-                    language = "csharp";
-                    break;
-                default:
-                    break;
-            }
-            return language;
-        }
-
-        @Override
-        public void run () {
-            try {
             while (true) {
                 Object input = in.readObject();
 
@@ -135,7 +86,7 @@ public class Server {
                     System.out.println("[Client "+uid+"] Request to "+request.getAction().name());
                     switch (request.getAction()) {
                         case DISCONNECT:
-                            clientHandlers.remove(this.getUid());
+                            Server.clientHandlers.remove(this.getUid());
                             break;
                         case SEND_MESSAGE:
                             String message = ((MessageRequest) request).getMessage();
@@ -181,7 +132,7 @@ public class Server {
 
                         case REQUEST_SERVER_PUBLIC_KEY: {
                             this.out.writeObject(RequestPublicKeyResponse.builder()
-                                    .publicKeyBytes(publicKey.getEncoded())
+                                    .publicKeyBytes(Server.publicKey.getEncoded())
                                     .statusCode(StatusCode.OK)
                                     .build());
                             this.out.flush();
@@ -214,43 +165,41 @@ public class Server {
                     }
                 }
             }
-            } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
 //                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    in.close();
-                    out.close();
-                    clientSocket.close();
-                    System.out.println("Disconnected to Client ["+uid+"]");
-                } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                out.close();
+                clientSocket.close();
+                System.out.println("Disconnected to Client ["+uid+"]");
+            } catch (Exception e) {
 
-                }
             }
         }
+    }
 
-        public String decryptUsingServerPublicKey(String encryptedText) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+    public String decryptUsingServerPublicKey(String encryptedText) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, Server.privateKey);
 
-            byte[] byteDecrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
-            String decryptedText = new String(byteDecrypted);
+        byte[] byteDecrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
+        String decryptedText = new String(byteDecrypted);
 
-            return decryptedText;
-        }
+        return decryptedText;
+    }
 
-        public Key decryptSecretKeyFromClient(String encryptedKey) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, IOException, ClassNotFoundException {
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+    public Key decryptSecretKeyFromClient(String encryptedKey) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, IOException, ClassNotFoundException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, Server.privateKey);
 
-            byte[] byteDecrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedKey));
-            SecretKey originalKey = new SecretKeySpec(byteDecrypted, 0, byteDecrypted.length, "AES");
+        byte[] byteDecrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedKey));
+        SecretKey originalKey = new SecretKeySpec(byteDecrypted, 0, byteDecrypted.length, "AES");
 
-            return originalKey;
-        }
+        return originalKey;
     }
 }
-
