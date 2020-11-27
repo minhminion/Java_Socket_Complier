@@ -138,6 +138,11 @@ public class Editor extends JFrame{
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
 
+        menu = new JMenu("Help");
+        menuItem = new JMenuItem(new ReconnectAction());
+        menuItem.setAccelerator(keyStroke);
+        menu.add(menuItem);
+
         mb.add(menu);
 
         return mb;
@@ -451,6 +456,15 @@ public class Editor extends JFrame{
                 }
 
             }
+        }
+    }
+
+    private class ReconnectAction extends AbstractAction {
+        ReconnectAction() {putValue(NAME, "Reconnect");}
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            showReconnectDialog();
         }
     }
 
