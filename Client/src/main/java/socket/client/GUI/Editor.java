@@ -44,7 +44,7 @@ public class Editor extends JFrame{
         console = new Console();
 
         createTabbedPane();
-        console.addText("Connecting to server ...");
+        console.addText("\n"+"Connecting to server ...");
 
         JSplitPane splitPane = new JSplitPane(SwingConstants.HORIZONTAL, tabbedPane,console);
         splitPane.setResizeWeight(0.7);
@@ -263,6 +263,15 @@ public class Editor extends JFrame{
         return console;
     }
 
+    public CodeEditor getCodeEditor() {
+        return codeEditor;
+    }
+
+    public void setCodeEditor(CodeEditor codeEditor) {
+        this.codeEditor = codeEditor;
+    }
+
+
     public void setText(String code) {
         codeEditor.setTextArea(code);
     }
@@ -324,8 +333,10 @@ public class Editor extends JFrame{
         public void actionPerformed(ActionEvent event) {
             if(editorHandler != null && !editorHandler.getClientSocket().isClosed()) {
                 String code = codeEditor.getTextArea().getText();
+                codeEditor.setCodeEditorFalse();
                 console.clearScreen();
-                console.addText("Compiling........");
+                console.showLoading();
+                console.addText("\n"+"Compiling........");
                 editorHandler.compileCode(currentLanguage, code);
             } else {
                showReconnectDialog();
@@ -343,7 +354,8 @@ public class Editor extends JFrame{
             if(editorHandler != null && !editorHandler.getClientSocket().isClosed()) {
                 String code = codeEditor.getTextArea().getText();
                 console.clearScreen();
-                console.addText("Formatting........");
+                console.showLoading();
+                console.addText("\n"+"Formating........");
 //                editorHandler.compileCode(currentLanguage, code);
                 editorHandler.formatCode(currentLanguage, code);
             } else {

@@ -72,7 +72,12 @@ public class CodeEditor extends JRootPane implements HyperlinkListener,
         return textArea;
     }
 
-
+    public void setCodeEditorFalse(){
+        textArea.setEditable(false);
+    }
+    public void setCodeEditorTrue(){
+        textArea.setEditable(true);
+    }
 
     public void setTheme (String xml) {
         InputStream in = getClass().

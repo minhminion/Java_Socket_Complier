@@ -36,8 +36,10 @@ public class EditorHandler {
     public void startConnection(String ip, int port) {
         try {
 //          Create Client socket
+            editor.getConsole().showLoading();
             clientSocket = new Socket(ip, port);
             if(clientSocket.isConnected()) {
+                editor.getConsole().disShowLoading();
                 editor.setHandler(this);
             }
             this.in = new ObjectInputStream(clientSocket.getInputStream());
@@ -111,7 +113,10 @@ public class EditorHandler {
                             editor.setText(compileResponse.getCode());
                             editor.getConsole().clearScreen();
                             long duration = (System.nanoTime() - startTime);
+                            editor.getConsole().disShowLoading();
+                            editor.getCodeEditor().setCodeEditorTrue();
                             editor.getConsole().addText("TIME EXECUTE: "+(double) duration / 1_000_000_000+" seconds");
+
                             editor.getConsole().addText(compileResponse.getOutput());
                         }
                     }
