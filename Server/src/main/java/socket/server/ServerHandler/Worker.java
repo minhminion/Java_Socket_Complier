@@ -44,8 +44,29 @@ public class Worker implements Runnable {
     }
 
     private void response(Response response) throws IOException {
-        this.out.writeObject(response);
-        this.out.flush();
+        if (clientSecretKey != null) {
+            try {
+                Cipher c = null;
+                c = Cipher.getInstance("AES");
+                c.init(Cipher.ENCRYPT_MODE, clientSecretKey);
+
+                SealedObject so = new SealedObject(response, c);
+
+                this.out.writeObject(so);
+                this.out.flush();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (NoSuchPaddingException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            } catch (IllegalBlockSizeException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.out.writeObject(response);
+            this.out.flush();
+        }
     }
 
     private String getLanguage (Language languageType) {

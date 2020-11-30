@@ -203,6 +203,17 @@ public class EditorHandler {
                         continue;
                     }
 
+                    if (object instanceof SealedObject) {
+                        try {
+                            SealedObject sealedObject = (SealedObject) object;
+                            object = sealedObject.getObject(mySecretKey);
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeyException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     if (object instanceof MessageResponse) {
                         MessageResponse messageResponse = (MessageResponse) object;
                         System.out.println("Message from server " + messageResponse.getMessage());
