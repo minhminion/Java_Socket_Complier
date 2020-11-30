@@ -137,6 +137,7 @@ public class Editor extends JFrame{
         keyStroke = KeyStroke.getKeyStroke("shift F9");
         menuItem.setAccelerator(keyStroke);
         menu.add(menuItem);
+        mb.add(menu);
 
         menu = new JMenu("Help");
         menuItem = new JMenuItem(new ReconnectAction());
