@@ -35,6 +35,7 @@ public class EditorHandler {
     private long startTime;
     private PublicKey serverPublicKey;
     private Key mySecretKey;
+    public String ip;
 
     public EditorHandler(Editor editor) {
         this.editor = editor;
@@ -88,6 +89,7 @@ public class EditorHandler {
     public void startConnection(String ip, int port) {
         try {
 //          Create Client socket
+            this.ip = ip;
             editor.getConsole().showLoading();
             clientSocket = new Socket(ip, port);
             if(clientSocket.isConnected()) {

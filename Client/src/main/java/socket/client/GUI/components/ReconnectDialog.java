@@ -1,5 +1,6 @@
 package socket.client.GUI.components;
 
+import socket.client.BUS.EditorHandler;
 import socket.client.GUI.Editor;
 
 import javax.swing.*;
@@ -22,6 +23,15 @@ public class ReconnectDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         setTitle("Reconnect to server");
+
+        EditorHandler editorHandler = editor.getEditorHandler();
+        if (editorHandler != null) {
+            serverIP.setText(editorHandler.ip);
+        } else {
+            serverIP.setText("0.0.0.0");
+        }
+
+
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -50,8 +60,7 @@ public class ReconnectDialog extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public static boolean isValidIPAddress(String ip)
-    {
+    public static boolean isValidIPAddress(String ip) {
         String zeroTo255
                 = "(\\d{1,2}|(0|1)\\"
                 + "d{2}|2[0-4]\\d|25[0-5])";

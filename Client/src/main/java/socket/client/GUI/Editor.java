@@ -398,21 +398,36 @@ public class Editor extends JFrame{
             fileChooser.setAcceptAllFileFilterUsed(false);
             fileChooser.setFileFilter(fileFilter);
 
-            int userSelection = fileChooser.showSaveDialog(parentFrame);
+            LOOP:
+            while(true) {
+                int userSelection = fileChooser.showSaveDialog(parentFrame);
 
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
 
-                String newFileAbsolutePath = fileToSave.getAbsolutePath();
-                Language newFileLanguage = CommonHelpers.getLanguageFromFilePath(newFileAbsolutePath);
-                String newFileSyntaxStyle = getLanguageSyntaxStyle(newFileLanguage);
+                    String newFileAbsolutePath = fileToSave.getAbsolutePath();
+                    Language newFileLanguage = CommonHelpers.getLanguageFromFilePath(newFileAbsolutePath);
+                    if(newFileLanguage != null) {
+                        String newFileSyntaxStyle = getLanguageSyntaxStyle(newFileLanguage);
 
-                /** Create new tab for new file */
-                addTab(
-                        fileToSave.getName(),
-                        newFileLanguage,
-                        newFileSyntaxStyle,
-                        newFileAbsolutePath);
+                        /** Create new tab for new file */
+                        addTab(
+                                fileToSave.getName(),
+                                newFileLanguage,
+                                newFileSyntaxStyle,
+                                newFileAbsolutePath);
+                        break LOOP;
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            parentFrame,
+                            "File not valid please choice again !",
+                            "File not allow",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } else {
+                    break LOOP;
+                }
             }
         }
     }
@@ -472,6 +487,10 @@ public class Editor extends JFrame{
         public void actionPerformed(ActionEvent e) {
             showReconnectDialog();
         }
+    }
+
+    public EditorHandler getEditorHandler () {
+        return editorHandler;
     }
 
     public String getLanguageSyntaxStyle(Language language)
